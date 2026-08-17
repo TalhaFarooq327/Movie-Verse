@@ -6,29 +6,29 @@ const BASE_URL = "https://api.themoviedb.org/3";
 const TOKEN = import.meta.env.VITE_TMDB_TOKEN;
 
 const IMG_BASE = "https://image.tmdb.org/t/p";
-export const posterUrl  = (path, size = "w500")    => path ? `${IMG_BASE}/${size}${path}` : null;
+export const posterUrl = (path, size = "w500") => path ? `${IMG_BASE}/${size}${path}` : null;
 export const backdropUrl = (path, size = "original") => path ? `${IMG_BASE}/${size}${path}` : null;
 
 // TMDB genre_id → display label map
 export const GENRE_MAP = {
-  28:    "Action",
-  35:    "Comedy",
-  27:    "Horror",
-  878:   "Sci-Fi",
-  18:    "Drama",
+  28: "Action",
+  35: "Comedy",
+  27: "Horror",
+  878: "Sci-Fi",
+  18: "Drama",
   10749: "Romance",
-  12:    "Adventure",
-  16:    "Animation",
-  80:    "Crime",
-  99:    "Documentary",
+  12: "Adventure",
+  16: "Animation",
+  80: "Crime",
+  99: "Documentary",
   10751: "Family",
-  14:    "Fantasy",
-  36:    "History",
+  14: "Fantasy",
+  36: "History",
   10402: "Music",
-  9648:  "Mystery",
+  9648: "Mystery",
   10752: "War",
-  37:    "Western",
-  53:    "Thriller",
+  37: "Western",
+  53: "Thriller",
 };
 
 // Reverse: label → id
@@ -47,7 +47,7 @@ async function tmdbFetch(path, params = {}) {
   const res = await fetch(url.toString(), {
     headers: {
       Authorization: `Bearer ${TOKEN}`,
-      "Content-Type":  "application/json",
+      "Content-Type": "application/json",
     },
   });
 
@@ -63,17 +63,17 @@ export function shapeMovie(raw) {
     "Movie";
 
   return {
-    id:          raw.id,
-    title:       raw.title || raw.name || "Untitled",
-    genre:       genreLabel,
-    genreIds:    raw.genre_ids || raw.genres?.map((g) => g.id) || [],
-    rating:      raw.vote_average ? Math.round(raw.vote_average * 10) / 10 : 0,
-    year:        raw.release_date ? raw.release_date.slice(0, 4) : "N/A",
-    poster:      posterUrl(raw.poster_path),
-    backdrop:    backdropUrl(raw.backdrop_path),
+    id: raw.id,
+    title: raw.title || raw.name || "Untitled",
+    genre: genreLabel,
+    genreIds: raw.genre_ids || raw.genres?.map((g) => g.id) || [],
+    rating: raw.vote_average ? Math.round(raw.vote_average * 10) / 10 : 0,
+    year: raw.release_date ? raw.release_date.slice(0, 4) : "N/A",
+    poster: posterUrl(raw.poster_path),
+    backdrop: backdropUrl(raw.backdrop_path),
     description: raw.overview || "No description available.",
-    popularity:  raw.popularity,
-    voteCount:   raw.vote_count,
+    popularity: raw.popularity,
+    voteCount: raw.vote_count,
   };
 }
 
@@ -93,9 +93,9 @@ export async function fetchPopular(page = 1) {
 
 /** Discover movies — supports genre filter AND sort_by */
 export async function fetchDiscover({
-  genreId  = null,
-  sortBy   = "popularity.desc",
-  page     = 1,
+  genreId = null,
+  sortBy = "popularity.desc",
+  page = 1,
 } = {}) {
   const params = { sort_by: sortBy, page, include_adult: false };
   if (genreId) params.with_genres = genreId;
@@ -124,9 +124,9 @@ export async function fetchMovieDetail(tmdbId) {
 
   // Cast
   const cast = (data.credits?.cast || []).slice(0, 10).map((c) => ({
-    name:      c.name,
-    role:      c.character,
-    avatar:    posterUrl(c.profile_path, "w185"),
+    name: c.name,
+    role: c.character,
+    avatar: posterUrl(c.profile_path, "w185"),
     profileId: c.id,
   }));
 
@@ -145,11 +145,11 @@ export async function fetchMovieDetail(tmdbId) {
   return {
     ...shaped,
     fullDescription: data.overview || shaped.description,
-    tagline:         data.tagline || null,
+    tagline: data.tagline || null,
     director,
     duration,
-    budget:          data.budget || null,
-    revenue:         data.revenue || null,
+    budget: data.budget || null,
+    revenue: data.revenue || null,
     trailerKey,
     cast,
     // full genres list for display
@@ -163,6 +163,16 @@ export async function fetchRecommendations(tmdbId) {
   return data.results.slice(0, 8).map(shapeMovie);
 }
 
-/** VidSrc embed URL for a movie */
+/** Streaming provider servers */
+export const STREAM_SERVERS = [
+  { id: "vidsrc_me", name: "VidSrc Pro", badge: "HQ", url: (id) => `https://vidsrc.me/embed/movie/${id}` },
+  { id: "vidsrc_sbs", name: "VidSrc Primary", badge: "Fast", url: (id) => `https://vidsrc.sbs/embed/movie/${id}` },
+  { id: "vidsrc_cc", name: "VidSrc Fast", badge: "HD", url: (id) => `https://vidsrc.cc/v2/embed/movie/${id}` },
+  { id: "embed_su", name: "SuperEmbed", badge: "4K", url: (id) => `https://embed.su/embed/movie/${id}` },
+  { id: "embed_2", name: "2Embed", badge: "Alt", url: (id) => `https://www.2embed.cc/embed/${id}` },
+];
+
+/** VidSrc embed URL for a movie (default) */
 export const vidSrcMovieUrl = (tmdbId) =>
   `https://vidsrc.sbs/embed/movie/${tmdbId}`;
+

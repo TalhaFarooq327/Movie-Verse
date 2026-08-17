@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import "./Navbar.css";
 
 const Navbar = () => {
@@ -7,12 +7,30 @@ const Navbar = () => {
   const [menuOpen,     setMenuOpen]     = useState(false);
   const [searchQuery,  setSearchQuery]  = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 60);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
+
+  // Close mobile menu when route changes
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname, location.search]);
 
   const handleSearch = (e) => {
     e.preventDefault();

@@ -5,7 +5,7 @@ import { SkeletonGrid } from "../components/SkeletonCard";
 import {
   fetchMovieDetail,
   fetchRecommendations,
-  vidSrcMovieUrl,
+  STREAM_SERVERS,
   posterUrl,
 } from "../api/tmdb";
 import "./MovieDetail.css";
@@ -45,37 +45,194 @@ const StarRating = ({ rating }) => {
   );
 };
 
-// ── VidSrc Player Modal ───────────────────────────────────────
-const PlayerModal = ({ tmdbId, title, onClose }) => {
-  // Prevent body scroll when modal is open
+// ── Upgraded Video Streaming Player Modal ───────────────────────────────
+const PlayerModal = ({ tmdbId, title, year, rating, onClose }) => {
+  const navigate                        = useNavigate();
+  const [activeServer, setActiveServer] = useState(STREAM_SERVERS[0]);
+  const [cinemaMode, setCinemaMode]     = useState(false);
+  const [key, setKey]                   = useState(0); // forces iframe refresh
+  const [searchQuery, setSearchQuery]   = useState("");
+
+  // Lock body scroll when modal is open
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => { document.body.style.overflow = ""; };
   }, []);
 
+  const handleRefresh = () => {
+    setKey((prev) => prev + 1);
+  };
+
+  const handleNav = (path) => {
+    onClose();
+    navigate(path);
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      onClose();
+      navigate(`/movies?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
   return (
-    <div className="player-modal" onClick={onClose}>
-      <div className="player-modal-inner" onClick={(e) => e.stopPropagation()}>
-        <div className="player-modal-header">
-          <h3>{title}</h3>
-          <button className="player-close-btn" onClick={onClose} id="player-close-btn" aria-label="Close player">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="M18 6L6 18M6 6l12 12" />
-            </svg>
-          </button>
+    <div className={`player-modal ${cinemaMode ? "cinema-mode" : ""}`} onClick={onClose}>
+      {/* ── Player Navbar Bar ── */}
+      <nav className="player-top-nav" onClick={(e) => e.stopPropagation()}>
+        <div className="player-nav-inner">
+          {/* Left: Back button + Logo */}
+          <div className="player-nav-left">
+            <button
+              className="player-back-btn"
+              onClick={onClose}
+              id="player-nav-back-btn"
+              title="Close player & go back"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="18" height="18">
+                <path d="m15 18-6-6 6-6" />
+              </svg>
+              <span>Back</span>
+            </button>
+
+            <div className="player-nav-divider" />
+
+            <div
+              className="player-nav-logo"
+              onClick={() => handleNav("/")}
+              role="button"
+              tabIndex={0}
+              title="Go to Home"
+            >
+              <span className="logo-icon">🎬</span>
+              <span className="logo-text">Movie<span className="logo-accent">Verse</span></span>
+            </div>
+          </div>
+
+          {/* Center: Nav links */}
+          <ul className="player-nav-links">
+            <li><button onClick={() => handleNav("/")}>Home</button></li>
+            <li><button onClick={() => handleNav("/movies")}>Movies</button></li>
+            <li><button onClick={() => handleNav("/movies?genre=Action")}>Action</button></li>
+            <li><button onClick={() => handleNav("/movies?genre=Comedy")}>Comedy</button></li>
+            <li><button onClick={() => handleNav("/movies?genre=Horror")}>Horror</button></li>
+            <li><button onClick={() => handleNav("/movies?genre=Sci-Fi")}>Sci-Fi</button></li>
+          </ul>
+
+          {/* Right: Search + Close */}
+          <div className="player-nav-right">
+            <form className="player-nav-search" onSubmit={handleSearch}>
+              <input
+                type="text"
+                placeholder="Search movies..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                id="player-search-input"
+              />
+              <button type="submit" aria-label="Search">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="m21 21-4.35-4.35" />
+                </svg>
+              </button>
+            </form>
+
+            <button
+              className="player-close-btn"
+              onClick={onClose}
+              id="player-close-btn"
+              aria-label="Close player"
+              title="Exit Player"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
+      </nav>
+
+      {/* ── Video Player Modal Container ── */}
+      <div className="player-modal-inner" onClick={(e) => e.stopPropagation()}>
+        {/* Header */}
+        <div className="player-modal-header">
+          <div className="player-title-box">
+            <span className="player-badge">NOW STREAMING</span>
+            <h3 className="player-movie-title">{title}</h3>
+            {year && <span className="player-meta-tag">{year}</span>}
+            <span className="player-quality-tag">HD 1080p</span>
+          </div>
+
+          <div className="player-header-actions">
+            <button
+              className={`player-tool-btn ${cinemaMode ? "active" : ""}`}
+              onClick={() => setCinemaMode(!cinemaMode)}
+              title="Toggle Cinema Mode (Lights Off)"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
+                <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+              </svg>
+              <span>{cinemaMode ? "Lights On" : "Lights Off"}</span>
+            </button>
+
+            <button
+              className="player-tool-btn"
+              onClick={handleRefresh}
+              title="Reload Video Player"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
+                <path d="M23 4v6h-6M1 20v-6h6" />
+                <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
+              </svg>
+              <span>Reload</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Server Selector Bar */}
+        <div className="player-server-bar">
+          <span className="server-bar-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14">
+              <rect x="2" y="2" width="20" height="8" rx="2" ry="2" />
+              <rect x="2" y="14" width="20" height="8" rx="2" ry="2" />
+              <line x1="6" y1="6" x2="6.01" y2="6" />
+              <line x1="6" y1="18" x2="6.01" y2="18" />
+            </svg>
+            Server:
+          </span>
+          <div className="server-pills">
+            {STREAM_SERVERS.map((server) => (
+              <button
+                key={server.id}
+                className={`server-pill ${activeServer.id === server.id ? "active" : ""}`}
+                onClick={() => setActiveServer(server)}
+              >
+                <span className="server-name">{server.name}</span>
+                <span className="server-badge">{server.badge}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Video Iframe Frame */}
         <div className="player-iframe-wrapper">
           <iframe
-            src={vidSrcMovieUrl(tmdbId)}
+            key={key}
+            src={activeServer.url(tmdbId)}
             title={`Watch ${title}`}
             allowFullScreen
-            allow="autoplay; encrypted-media; picture-in-picture"
+            allow="autoplay; encrypted-media; picture-in-picture; accelerometer; gyroscope"
             referrerPolicy="origin"
           />
         </div>
-        <p className="player-disclaimer">
-          Streaming via VidSrc. If the video doesn't load, try refreshing or check your ad-blocker settings.
-        </p>
+
+        {/* Player Footer */}
+        <div className="player-footer-bar">
+          <div className="player-status-info">
+            <span className="status-dot" />
+            <span>Connected to <strong>{activeServer.name}</strong> • If controls or video are blocked, switch server above.</span>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -190,7 +347,17 @@ const MovieDetail = () => {
 
       <div className="container detail-container">
         {/* Back */}
-        <button className="back-btn" onClick={() => navigate(-1)} id="detail-back-btn">
+        <button
+          className="back-btn"
+          onClick={() => {
+            if (window.history.length > 2) {
+              navigate(-1);
+            } else {
+              navigate("/movies");
+            }
+          }}
+          id="detail-back-btn"
+        >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
             <path d="m15 18-6-6 6-6" />
           </svg>
@@ -375,6 +542,8 @@ const MovieDetail = () => {
         <PlayerModal
           tmdbId={movie.id}
           title={movie.title}
+          year={movie.year}
+          rating={movie.rating}
           onClose={() => setPlayerOpen(false)}
         />
       )}
