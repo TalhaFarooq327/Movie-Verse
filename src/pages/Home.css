@@ -1,5 +1,19 @@
 .home-page {}
 
+/* API error banner */
+.api-error {
+  background: rgba(229,9,20,0.08);
+  border: 1px solid rgba(229,9,20,0.25);
+  border-radius: var(--radius-sm);
+  padding: 14px 20px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 /* Section headers */
 .section-header {
   display: flex;

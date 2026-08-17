@@ -5,7 +5,7 @@
   left: 0;
   right: 0;
   z-index: 1000;
-  padding: 20px 0;
+  padding: 18px 0;
   transition: var(--transition);
 }
 
@@ -14,14 +14,16 @@
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border);
-  padding: 14px 0;
+  padding: 12px 0;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
 }
 
+/* ── 3-column grid: logo | links | search ── */
 .navbar-inner {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: 32px;
+  gap: 24px;
 }
 
 /* Logo */
@@ -29,42 +31,37 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 1.5rem;
-  font-weight: 800;
-  letter-spacing: -0.5px;
   flex-shrink: 0;
 }
 
-.logo-icon {
-  font-size: 1.4rem;
-}
+.logo-icon { font-size: 1.3rem; }
 
 .logo-text {
   font-family: var(--font-display);
-  font-size: 1.8rem;
+  font-size: 1.7rem;
   letter-spacing: 1px;
+  font-weight: 400;
 }
 
-.logo-accent {
-  color: var(--accent-red);
-}
+.logo-accent { color: var(--accent-red); }
 
-/* Nav Links */
+/* Nav Links — centered in the middle column */
 .navbar-links {
   display: flex;
   align-items: center;
-  gap: 4px;
-  margin-left: 16px;
+  justify-content: center;
+  gap: 2px;
 }
 
 .navbar-links a {
-  padding: 8px 14px;
+  padding: 7px 13px;
   border-radius: var(--radius-sm);
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   font-weight: 500;
   color: var(--text-secondary);
   transition: var(--transition-fast);
   white-space: nowrap;
+  cursor: pointer;
 }
 
 .navbar-links a:hover,
@@ -77,16 +74,16 @@
   color: var(--accent-red);
 }
 
-/* Search */
+/* Search — right column */
 .navbar-search {
   display: flex;
   align-items: center;
-  margin-left: auto;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid var(--border);
   border-radius: 100px;
   overflow: hidden;
   transition: var(--transition);
+  flex-shrink: 0;
 }
 
 .navbar-search:focus-within {
@@ -100,20 +97,18 @@
   border: none;
   outline: none;
   color: var(--text-primary);
-  padding: 9px 16px;
-  font-size: 0.875rem;
-  width: 200px;
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  width: 180px;
   font-family: var(--font-body);
 }
 
-.navbar-search input::placeholder {
-  color: var(--text-muted);
-}
+.navbar-search input::placeholder { color: var(--text-muted); }
 
 .navbar-search button {
   background: none;
   border: none;
-  padding: 9px 14px;
+  padding: 8px 12px;
   cursor: pointer;
   color: var(--text-secondary);
   display: flex;
@@ -121,14 +116,8 @@
   transition: var(--transition-fast);
 }
 
-.navbar-search button:hover {
-  color: var(--accent-red);
-}
-
-.navbar-search button svg {
-  width: 18px;
-  height: 18px;
-}
+.navbar-search button:hover { color: var(--accent-red); }
+.navbar-search button svg { width: 17px; height: 17px; }
 
 /* Hamburger */
 .hamburger {
@@ -139,7 +128,6 @@
   background: none;
   border: none;
   padding: 6px;
-  margin-left: auto;
 }
 
 .hamburger span {
@@ -176,28 +164,27 @@
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.mobile-menu.open {
-  transform: translateY(0);
-}
+.mobile-menu.open { transform: translateY(0); }
 
 .mobile-menu ul {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   width: 100%;
 }
 
 .mobile-menu a {
   display: block;
-  padding: 12px 32px;
-  font-size: 1.2rem;
+  padding: 11px 32px;
+  font-size: 1.1rem;
   font-weight: 600;
   color: var(--text-secondary);
   border-radius: var(--radius-sm);
   transition: var(--transition-fast);
   width: 100%;
   text-align: center;
+  cursor: pointer;
 }
 
 .mobile-menu a:hover,
@@ -235,10 +222,18 @@
   cursor: pointer;
 }
 
-/* Responsive */
+/* ── Responsive ── */
 @media (max-width: 1024px) {
+  .navbar-inner {
+    grid-template-columns: auto 1fr auto;
+  }
   .navbar-links { display: none; }
   .navbar-search { display: none; }
   .hamburger { display: flex; }
   .mobile-menu { display: flex; }
+}
+
+@media (max-width: 1200px) {
+  .navbar-search input { width: 140px; }
+  .navbar-links a { padding: 7px 10px; font-size: 0.82rem; }
 }

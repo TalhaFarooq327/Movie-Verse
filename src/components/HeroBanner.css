@@ -15,27 +15,37 @@
   inset: 0;
 }
 
-.hero-backdrop img {
+/* Stacked slides — crossfade between them */
+.hero-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+
+.hero-slide.active {
+  opacity: 1;
+}
+
+.hero-slide img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transform: scale(1.05);
+  transform: scale(1);
   transition: transform 8s ease;
 }
 
-.hero.loaded .hero-backdrop img {
+.hero-slide.active img {
   transform: scale(1);
 }
 
 .hero-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    90deg,
-    rgba(10, 10, 15, 0.95) 0%,
-    rgba(10, 10, 15, 0.7) 50%,
-    rgba(10, 10, 15, 0.3) 100%
-  );
+  background: linear-gradient(90deg,
+      rgba(10, 10, 15, 0.95) 0%,
+      rgba(10, 10, 15, 0.7) 50%,
+      rgba(10, 10, 15, 0.3) 100%);
 }
 
 .hero-overlay-bottom {
@@ -88,8 +98,17 @@
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(0.8); }
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.5;
+    transform: scale(0.8);
+  }
 }
 
 .hero-title {
@@ -98,7 +117,7 @@
   letter-spacing: 3px;
   line-height: 1;
   margin-bottom: 20px;
-  text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
   opacity: 0;
   animation: fadeInUp 0.6s ease 0.35s forwards;
 }
@@ -136,8 +155,8 @@
 
 .hero-genre {
   padding: 3px 12px;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 100px;
   font-size: 0.8rem;
   color: var(--text-secondary);
@@ -165,45 +184,67 @@
   animation: fadeInUp 0.6s ease 0.8s forwards;
 }
 
-/* Scroll indicator */
-.scroll-indicator {
+
+
+/* Skeleton states */
+.hero-skeleton {
+  background: var(--bg-surface);
+}
+
+.hero-skeleton-bg {
   position: absolute;
-  bottom: 28px;
-  left: 50%;
-  transform: translateX(-50%);
+  inset: 0;
+  background: var(--bg-card);
+}
+
+.hero-skeleton-badge {
+  width: 120px;
+  height: 26px;
+  border-radius: 100px;
+  margin-bottom: 24px;
+}
+
+.hero-skeleton-title {
+  width: min(500px, 80%);
+  height: 72px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.hero-skeleton-meta {
+  width: 280px;
+  height: 20px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+
+.hero-skeleton-desc {
+  width: min(560px, 90%);
+  height: 16px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+.hero-skeleton-desc.short {
+  width: 60%;
+}
+
+.hero-skeleton-btns {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  opacity: 0;
-  animation: fadeIn 0.6s ease 1.4s forwards;
-  color: var(--text-muted);
-  font-size: 0.72rem;
-  letter-spacing: 1px;
-  text-transform: uppercase;
+  gap: 12px;
+  margin-top: 24px;
 }
 
-.scroll-mouse {
-  width: 22px;
-  height: 36px;
-  border: 2px solid rgba(255,255,255,0.2);
-  border-radius: 12px;
-  display: flex;
-  justify-content: center;
-  padding-top: 6px;
+.hero-skeleton-btn {
+  width: 140px;
+  height: 46px;
+  border-radius: var(--radius-sm);
 }
 
-.scroll-wheel {
-  width: 3px;
-  height: 8px;
-  background: var(--accent-red);
-  border-radius: 2px;
-  animation: scroll-anim 1.5s ease infinite;
-}
-
-@keyframes scroll-anim {
-  0% { transform: translateY(0); opacity: 1; }
-  100% { transform: translateY(10px); opacity: 0; }
+.hero-backdrop-fallback {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #0d0d1a 0%, #1a0a0f 100%);
 }
 
 /* Responsive */
@@ -216,16 +257,25 @@
   }
 
   .hero-overlay {
-    background: linear-gradient(
-      to top,
-      rgba(10, 10, 15, 0.98) 0%,
-      rgba(10, 10, 15, 0.6) 60%,
-      rgba(10, 10, 15, 0.3) 100%
-    );
+    background: linear-gradient(to top,
+        rgba(10, 10, 15, 0.98) 0%,
+        rgba(10, 10, 15, 0.6) 60%,
+        rgba(10, 10, 15, 0.3) 100%);
   }
 
-  .hero-title { font-size: clamp(2.5rem, 10vw, 4rem); }
-  .hero-description { font-size: 0.9rem; }
-  .hero-actions { gap: 10px; }
-  .scroll-indicator { display: none; }
+  .hero-title {
+    font-size: clamp(2.5rem, 10vw, 4rem);
+  }
+
+  .hero-description {
+    font-size: 0.9rem;
+  }
+
+  .hero-actions {
+    gap: 10px;
+  }
+
+  .scroll-indicator {
+    display: none;
+  }
 }

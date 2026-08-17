@@ -4,6 +4,223 @@
   padding-top: 80px;
 }
 
+/* ── VidSrc Player Modal ─────────────────── */
+.player-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.96);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+  animation: fadeIn 0.2s ease forwards;
+  backdrop-filter: blur(12px);
+}
+
+.player-modal-inner {
+  position: relative;
+  width: 100%;
+  max-width: 1100px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(229,9,20,0.1);
+  animation: fadeInUp 0.3s ease forwards;
+}
+
+.player-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-card);
+}
+
+.player-modal-header h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.player-close-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.player-close-btn svg { width: 16px; height: 16px; }
+
+.player-close-btn:hover {
+  background: var(--accent-red);
+  border-color: var(--accent-red);
+  color: white;
+}
+
+.player-iframe-wrapper {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 */
+  height: 0;
+  background: #000;
+}
+
+.player-iframe-wrapper iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.player-disclaimer {
+  padding: 10px 20px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-align: center;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border);
+}
+
+/* ── Detail skeleton ─────────────────────── */
+.detail-skeleton { padding-top: 60px; }
+
+.skeleton-poster-lg {
+  width: 100%;
+  aspect-ratio: 2/3;
+  border-radius: var(--radius-lg);
+}
+
+.detail-sk-badge  { width: 100px; height: 24px; border-radius: 100px; margin-bottom: 20px; }
+.detail-sk-title  { width: 80%;  height: 60px; border-radius: 8px; margin-bottom: 20px; }
+.detail-sk-meta   { width: 300px; height: 18px; border-radius: 6px; margin-bottom: 20px; }
+.detail-sk-line   { width: 100%; height: 14px; border-radius: 6px; margin-bottom: 12px; }
+.detail-sk-line.short { width: 65%; }
+.detail-sk-btns   { display: flex; gap: 12px; margin-top: 24px; }
+.detail-sk-btn    { width: 140px; height: 46px; border-radius: var(--radius-sm); }
+
+/* ── Genres row ──────────────────────────── */
+.detail-genres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.detail-genre-badge {
+  display: inline-flex;
+  padding: 4px 13px;
+  background: rgba(229, 9, 20, 0.1);
+  border: 1px solid rgba(229, 9, 20, 0.25);
+  border-radius: 100px;
+  color: var(--accent-red);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+/* ── Tagline ─────────────────────────────── */
+.detail-tagline {
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: 1rem;
+  margin-bottom: 0;
+}
+
+/* ── Meta pills ──────────────────────────── */
+.detail-meta-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.meta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+/* ── Financials ──────────────────────────── */
+.detail-financials {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.financial-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  min-width: 120px;
+}
+
+.financial-label {
+  font-size: 0.72rem;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.financial-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent-gold);
+}
+
+/* ── Watch under poster ──────────────────── */
+.watch-poster-btn {
+  width: 100%;
+  justify-content: center;
+  margin-top: 16px;
+  padding: 14px;
+  font-size: 1rem;
+}
+
+/* ── API Error in detail ─────────────────── */
+.api-error-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  background: rgba(229,9,20,0.07);
+  border: 1px solid rgba(229,9,20,0.2);
+  border-radius: var(--radius-md);
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  font-size: 0.9rem;
+}
+
+.api-error-box span { font-size: 1.4rem; flex-shrink: 0; }
+.api-error-box div  { flex: 1; }
+.api-error-box strong { color: var(--text-primary); display: block; margin-bottom: 4px; }
+.api-error-box p    { color: var(--text-secondary); margin: 0; }
+
 /* Backdrop */
 .detail-backdrop {
   position: fixed;

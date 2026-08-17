@@ -1,36 +1,84 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { featuredMovie } from "../data/movies";
 import "./HeroBanner.css";
 
-const HeroBanner = () => {
-  const movie = featuredMovie;
-  const [loaded, setLoaded] = useState(false);
+const INTERVAL = 6000; // ms between auto-changes
+
+const HeroBanner = ({ movies = [], movie: singleMovie }) => {
+  // Support both single movie (legacy) and movies array (auto-scroll)
+  const slides = movies.length > 0 ? movies : singleMovie ? [singleMovie] : [];
+  const [current, setCurrent] = useState(0);
+  const [loaded, setLoaded]   = useState(false);
+  const timerRef              = useRef(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoaded(true), 100);
-    return () => clearTimeout(timer);
+    const t = setTimeout(() => setLoaded(true), 80);
+    return () => clearTimeout(t);
   }, []);
+
+  // Auto-advance silently in background
+  useEffect(() => {
+    if (slides.length <= 1) return;
+    timerRef.current = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % slides.length);
+    }, INTERVAL);
+    return () => clearInterval(timerRef.current);
+  }, [slides.length]);
+
+  // Skeleton when no data yet
+  if (slides.length === 0) {
+    return (
+      <section className="hero hero-skeleton">
+        <div className="hero-skeleton-bg shimmer" />
+        <div className="container hero-content">
+          <div className="hero-skeleton-badge shimmer" />
+          <div className="hero-skeleton-title shimmer" />
+          <div className="hero-skeleton-meta shimmer" />
+          <div className="hero-skeleton-desc shimmer" />
+          <div className="hero-skeleton-desc short shimmer" />
+          <div className="hero-skeleton-btns">
+            <div className="shimmer hero-skeleton-btn" />
+            <div className="shimmer hero-skeleton-btn" />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  const movie = slides[current];
 
   return (
     <section className={`hero ${loaded ? "loaded" : ""}`}>
-      {/* Backdrop */}
+      {/* ── Auto-cycling backdrops (hidden crossfade) ── */}
       <div className="hero-backdrop">
-        <img src={movie.backdrop} alt={movie.title} onError={(e) => (e.target.src = movie.poster)} />
+        {slides.map((m, i) => (
+          <div
+            key={m.id}
+            className={`hero-slide ${i === current ? "active" : ""}`}
+          >
+            {m.backdrop && (
+              <img
+                src={m.backdrop}
+                alt={m.title}
+                onError={(e) => { e.target.style.display = "none"; }}
+              />
+            )}
+          </div>
+        ))}
         <div className="hero-overlay" />
         <div className="hero-overlay-bottom" />
       </div>
 
-      {/* Noise texture */}
       <div className="hero-noise" />
 
-      {/* Content */}
+      {/* ── Content ── */}
       <div className="container hero-content">
         <div className="hero-badge">
           <span className="hero-badge-dot" />
           Featured Film
         </div>
-        <h1 className="hero-title">{movie.title}</h1>
+
+        <h1 className="hero-title" key={movie.id}>{movie.title}</h1>
 
         <div className="hero-meta">
           <span className="hero-rating">
@@ -40,11 +88,11 @@ const HeroBanner = () => {
             {movie.rating}
           </span>
           <span className="hero-year">{movie.year}</span>
-          <span className="hero-duration">{movie.duration}</span>
+          {movie.duration && <span className="hero-duration">{movie.duration}</span>}
           <span className="hero-genre">{movie.genre}</span>
         </div>
 
-        <p className="hero-description">{movie.description}</p>
+        <p className="hero-description" key={`desc-${movie.id}`}>{movie.description}</p>
 
         <div className="hero-actions">
           <Link to={`/movie/${movie.id}`} className="btn btn-primary" id="hero-watch-btn">
@@ -53,13 +101,9 @@ const HeroBanner = () => {
             </svg>
             Watch Now
           </Link>
-          <a href={movie.trailer} target="_blank" rel="noopener noreferrer" className="btn btn-ghost" id="hero-trailer-btn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18">
-              <circle cx="12" cy="12" r="10" />
-              <polygon points="10,8 16,12 10,16 10,8" fill="currentColor" stroke="none" />
-            </svg>
-            Watch Trailer
-          </a>
+          <Link to={`/movie/${movie.id}`} className="btn btn-ghost" id="hero-info-btn">
+            More Info
+          </Link>
           <Link to="/movies" className="btn btn-ghost" id="hero-browse-btn">
             Browse All
           </Link>
