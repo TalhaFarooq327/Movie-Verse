@@ -73,11 +73,6 @@ const HeroBanner = ({ movies = [], movie: singleMovie }) => {
 
       {/* ── Content ── */}
       <div className="container hero-content">
-        <div className="hero-badge">
-          <span className="hero-badge-dot" />
-          Featured Film
-        </div>
-
         <h1 className="hero-title" key={movie.id}>{movie.title}</h1>
 
         <div className="hero-meta">
@@ -95,13 +90,13 @@ const HeroBanner = ({ movies = [], movie: singleMovie }) => {
         <p className="hero-description" key={`desc-${movie.id}`}>{movie.description}</p>
 
         <div className="hero-actions">
-          <Link to={`/movie/${movie.id}`} className="btn btn-primary" id="hero-watch-btn">
+          <Link to={`/${movie.mediaType === "tv" ? "tv" : "movie"}/${movie.id}`} className="btn btn-primary" id="hero-watch-btn">
             <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
               <path d="M8 5v14l11-7z" />
             </svg>
             Watch Now
           </Link>
-          <Link to={`/movie/${movie.id}`} className="btn btn-ghost" id="hero-info-btn">
+          <Link to={`/${movie.mediaType === "tv" ? "tv" : "movie"}/${movie.id}`} className="btn btn-ghost" id="hero-info-btn">
             More Info
           </Link>
           <Link to="/movies" className="btn btn-ghost" id="hero-browse-btn">

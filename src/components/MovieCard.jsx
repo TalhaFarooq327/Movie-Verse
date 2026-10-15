@@ -1,17 +1,20 @@
 import { Link } from "react-router-dom";
 import "./MovieCard.css";
 
+const FALLBACK_POSTER = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="450" viewBox="0 0 300 450"><rect width="100%" height="100%" fill="%231c1c28"/><circle cx="150" cy="200" r="42" fill="%23252538"/><text x="50%" y="213" font-size="34" text-anchor="middle" fill="%23a0a0b8">🎬</text><text x="50%" y="275" font-family="system-ui,sans-serif" font-size="13" font-weight="600" text-anchor="middle" fill="%237b7b95">No Poster Available</text></svg>`;
+
 const MovieCard = ({ movie }) => {
   return (
-    <Link to={`/movie/${movie.id}`} className="movie-card" id={`movie-card-${movie.id}`}>
+    <Link to={`/${movie.mediaType === "tv" ? "tv" : "movie"}/${movie.id}`} className="movie-card" id={`movie-card-${movie.id}`}>
       {/* Poster */}
       <div className="movie-card-poster">
         <img
-          src={movie.poster}
+          src={movie.poster || FALLBACK_POSTER}
           alt={movie.title}
           loading="lazy"
           onError={(e) => {
-            e.target.src = `https://via.placeholder.com/300x450/1c1c28/a0a0b8?text=${encodeURIComponent(movie.title)}`;
+            e.target.onerror = null;
+            e.target.src = FALLBACK_POSTER;
           }}
         />
         {/* Overlay */}
@@ -28,6 +31,8 @@ const MovieCard = ({ movie }) => {
         </div>
         {/* Genre badge */}
         <div className="card-genre-badge">{movie.genre}</div>
+        {/* TV badge */}
+        {movie.mediaType === "tv" && <div className="card-tv-badge">TV</div>}
       </div>
 
       {/* Info */}

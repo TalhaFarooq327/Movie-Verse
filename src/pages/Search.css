@@ -1,0 +1,218 @@
+/* ── Search Page Styles ────────────────────────────────────── */
+
+.search-page {
+  min-height: 100vh;
+  padding-bottom: 80px;
+}
+
+/* Header */
+.search-header {
+  padding: 130px 0 40px;
+  background: radial-gradient(ellipse 80% 120% at 50% 0%, rgba(229, 9, 20, 0.08) 0%, rgba(124, 58, 237, 0.04) 50%, transparent 80%);
+  border-bottom: 1px solid var(--border);
+}
+
+.search-header-inner {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.search-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 100px;
+  background: linear-gradient(135deg, rgba(229, 9, 20, 0.2), rgba(124, 58, 237, 0.2));
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.search-title {
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 10px;
+  line-height: 1.2;
+}
+
+.search-query-highlight {
+  color: var(--accent-red);
+}
+
+.search-subtitle {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin: 0 0 28px;
+}
+
+/* Search bar wrap */
+.search-bar-wrap {
+  max-width: 600px;
+  margin: 0 auto 24px;
+}
+
+/* Tabs & sort row */
+.search-tabs-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.search-type-tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.search-type-tab {
+  padding: 8px 20px;
+  border-radius: 100px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.search-type-tab:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.search-type-tab.active {
+  background: linear-gradient(135deg, var(--accent-red), #b0060f);
+  color: #fff;
+  border-color: var(--accent-red);
+  box-shadow: 0 2px 14px rgba(229, 9, 20, 0.4);
+}
+
+/* Sort dropdown */
+.search-sort-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.search-sort-select {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  cursor: pointer;
+  outline: none;
+  transition: var(--transition-fast);
+}
+
+.search-sort-select:focus {
+  border-color: var(--accent-red);
+}
+
+/* Results Content */
+.search-content {
+  padding-top: 40px;
+}
+
+.search-meta-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.search-count-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* Results Grid */
+.search-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 20px;
+}
+
+/* Empty states */
+.search-empty-prompt {
+  text-align: center;
+  padding: 80px 20px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.search-empty-icon {
+  font-size: 3.5rem;
+  display: block;
+  margin-bottom: 16px;
+  opacity: 0.8;
+}
+
+.search-empty-prompt h3 {
+  font-size: 1.4rem;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.search-empty-prompt p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.search-no-results {
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.no-results-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 16px;
+}
+
+/* Load more */
+.search-load-more {
+  text-align: center;
+  margin-top: 48px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .search-header {
+    padding: 100px 0 32px;
+  }
+  .search-title {
+    font-size: 1.8rem;
+  }
+  .search-tabs-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .search-type-tabs {
+    justify-content: center;
+  }
+  .search-sort-wrap {
+    justify-content: center;
+  }
+  .search-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 14px;
+  }
+}

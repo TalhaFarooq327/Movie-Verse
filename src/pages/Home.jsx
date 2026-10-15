@@ -2,27 +2,24 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import HeroBanner from "../components/HeroBanner";
 import MovieCard from "../components/MovieCard";
-import GenreFilter from "../components/GenreFilter";
 import { SkeletonGrid } from "../components/SkeletonCard";
-import { fetchTrending, fetchDiscover, GENRE_ID_MAP } from "../api/tmdb";
+import { fetchTrending, fetchTrendingTV } from "../api/tmdb";
 import "./Home.css";
 
 const Home = () => {
   const [trending, setTrending] = useState([]);
-  const [genreMovies, setGenreMovies] = useState([]);
-  const [activeGenre, setActiveGenre] = useState("All");
+  const [trendingTV, setTrendingTV] = useState([]);
   const [loadingTrend, setLoadingTrend] = useState(true);
-  const [loadingGenre, setLoadingGenre] = useState(false);
+  const [loadingTV, setLoadingTV] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch trending on mount
+  // Fetch trending movies on mount
   useEffect(() => {
     (async () => {
       try {
         setLoadingTrend(true);
         const results = await fetchTrending();
         setTrending(results);
-        setGenreMovies(results);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -31,26 +28,20 @@ const Home = () => {
     })();
   }, []);
 
-  // Fetch by genre when tab changes
+  // Fetch trending TV on mount
   useEffect(() => {
-    if (loadingTrend) return;
     (async () => {
-      if (activeGenre === "All") {
-        setGenreMovies(trending);
-        return;
-      }
       try {
-        setLoadingGenre(true);
-        const genreId = GENRE_ID_MAP[activeGenre];
-        const { results } = await fetchDiscover({ genreId });
-        setGenreMovies(results);
+        setLoadingTV(true);
+        const results = await fetchTrendingTV();
+        setTrendingTV(results);
       } catch {
-        setGenreMovies([]);
+        // silently fail — TV section just won't show
       } finally {
-        setLoadingGenre(false);
+        setLoadingTV(false);
       }
     })();
-  }, [activeGenre, trending, loadingTrend]);
+  }, []);
 
   return (
     <div className="home-page">
@@ -94,43 +85,34 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Genre Browse */}
-      <section className="genre-section">
+      {/* Trending TV Shows */}
+      <section className="section trending-tv-section">
         <div className="container">
           <div className="section-header">
             <div>
               <h2 className="section-title">
-                <span className="accent-bar" />
-                Browse by Genre
+                <span className="accent-bar accent-bar-purple" />
+                Trending TV Shows
               </h2>
-              <p className="section-subtitle">Find movies that match your mood</p>
+              <p className="section-subtitle">Binge-worthy series everyone's watching</p>
             </div>
-          </div>
-
-          <GenreFilter activeGenre={activeGenre} onGenreChange={setActiveGenre} />
-
-          {loadingGenre ? (
-            <div style={{ marginTop: "32px" }}>
-              <SkeletonGrid count={8} />
-            </div>
-          ) : genreMovies.length > 0 ? (
-            <div className="genre-movie-grid stagger">
-              {genreMovies.slice(0, 12).map((movie) => (
-                <MovieCard key={movie.id} movie={movie} />
-              ))}
-            </div>
-          ) : (
-            <div className="no-results">
-              <h3>No movies found</h3>
-              <p>Try a different genre</p>
-            </div>
-          )}
-
-          <div className="genre-cta">
-            <Link to="/movies" className="btn btn-primary" id="genre-browse-all-btn">
-              Browse All Movies
+            <Link to="/tv-shows" className="view-all-link" id="trending-tv-view-all">
+              View All
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="m9 18 6-6-6-6" />
+              </svg>
             </Link>
           </div>
+
+          {loadingTV ? (
+            <SkeletonGrid count={8} />
+          ) : trendingTV.length > 0 ? (
+            <div className="trending-grid stagger">
+              {trendingTV.map((show) => (
+                <MovieCard key={show.id} movie={show} />
+              ))}
+            </div>
+          ) : null}
         </div>
       </section>
 
@@ -140,11 +122,11 @@ const Home = () => {
           <div className="stats-grid">
             <div className="stat-card">
               <span className="stat-number">500K+</span>
-              <span className="stat-label">Movies in Database</span>
+              <span className="stat-label">Movies & Shows</span>
             </div>
             <div className="stat-card">
-              <span className="stat-number">6</span>
-              <span className="stat-label">Featured Genres</span>
+              <span className="stat-number">3+</span>
+              <span className="stat-label">Streaming Servers</span>
             </div>
             <div className="stat-card">
               <span className="stat-number">4K</span>

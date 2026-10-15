@@ -6,15 +6,14 @@ import {
   fetchMovieDetail,
   fetchRecommendations,
   STREAM_SERVERS,
-  posterUrl,
 } from "../api/tmdb";
 import "./MovieDetail.css";
 
 // ── Star Rating component ─────────────────────────────────────
 const StarRating = ({ rating }) => {
-  const normalized = rating / 2; // TMDB is out of 10, stars out of 5
-  const full  = Math.floor(normalized);
-  const half  = normalized % 1 >= 0.5 ? 1 : 0;
+  const normalized = rating / 2;
+  const full = Math.floor(normalized);
+  const half = normalized % 1 >= 0.5 ? 1 : 0;
   const empty = 5 - full - half;
 
   return (
@@ -45,199 +44,6 @@ const StarRating = ({ rating }) => {
   );
 };
 
-// ── Upgraded Video Streaming Player Modal ───────────────────────────────
-const PlayerModal = ({ tmdbId, title, year, rating, onClose }) => {
-  const navigate                        = useNavigate();
-  const [activeServer, setActiveServer] = useState(STREAM_SERVERS[0]);
-  const [cinemaMode, setCinemaMode]     = useState(false);
-  const [key, setKey]                   = useState(0); // forces iframe refresh
-  const [searchQuery, setSearchQuery]   = useState("");
-
-  // Lock body scroll when modal is open
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = ""; };
-  }, []);
-
-  const handleRefresh = () => {
-    setKey((prev) => prev + 1);
-  };
-
-  const handleNav = (path) => {
-    onClose();
-    navigate(path);
-  };
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      onClose();
-      navigate(`/movies?search=${encodeURIComponent(searchQuery.trim())}`);
-    }
-  };
-
-  return (
-    <div className={`player-modal ${cinemaMode ? "cinema-mode" : ""}`} onClick={onClose}>
-      {/* ── Player Navbar Bar ── */}
-      <nav className="player-top-nav" onClick={(e) => e.stopPropagation()}>
-        <div className="player-nav-inner">
-          {/* Left: Back button + Logo */}
-          <div className="player-nav-left">
-            <button
-              className="player-back-btn"
-              onClick={onClose}
-              id="player-nav-back-btn"
-              title="Close player & go back"
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="18" height="18">
-                <path d="m15 18-6-6 6-6" />
-              </svg>
-              <span>Back</span>
-            </button>
-
-            <div className="player-nav-divider" />
-
-            <div
-              className="player-nav-logo"
-              onClick={() => handleNav("/")}
-              role="button"
-              tabIndex={0}
-              title="Go to Home"
-            >
-              <span className="logo-icon">🎬</span>
-              <span className="logo-text">Movie<span className="logo-accent">Verse</span></span>
-            </div>
-          </div>
-
-          {/* Center: Nav links */}
-          <ul className="player-nav-links">
-            <li><button onClick={() => handleNav("/")}>Home</button></li>
-            <li><button onClick={() => handleNav("/movies")}>Movies</button></li>
-            <li><button onClick={() => handleNav("/movies?genre=Action")}>Action</button></li>
-            <li><button onClick={() => handleNav("/movies?genre=Comedy")}>Comedy</button></li>
-            <li><button onClick={() => handleNav("/movies?genre=Horror")}>Horror</button></li>
-            <li><button onClick={() => handleNav("/movies?genre=Sci-Fi")}>Sci-Fi</button></li>
-          </ul>
-
-          {/* Right: Search + Close */}
-          <div className="player-nav-right">
-            <form className="player-nav-search" onSubmit={handleSearch}>
-              <input
-                type="text"
-                placeholder="Search movies..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                id="player-search-input"
-              />
-              <button type="submit" aria-label="Search">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
-                  <circle cx="11" cy="11" r="8" />
-                  <path d="m21 21-4.35-4.35" />
-                </svg>
-              </button>
-            </form>
-
-            <button
-              className="player-close-btn"
-              onClick={onClose}
-              id="player-close-btn"
-              aria-label="Close player"
-              title="Exit Player"
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M18 6L6 18M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </nav>
-
-      {/* ── Video Player Modal Container ── */}
-      <div className="player-modal-inner" onClick={(e) => e.stopPropagation()}>
-        {/* Header */}
-        <div className="player-modal-header">
-          <div className="player-title-box">
-            <span className="player-badge">NOW STREAMING</span>
-            <h3 className="player-movie-title">{title}</h3>
-            {year && <span className="player-meta-tag">{year}</span>}
-            <span className="player-quality-tag">HD 1080p</span>
-          </div>
-
-          <div className="player-header-actions">
-            <button
-              className={`player-tool-btn ${cinemaMode ? "active" : ""}`}
-              onClick={() => setCinemaMode(!cinemaMode)}
-              title="Toggle Cinema Mode (Lights Off)"
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
-                <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
-              </svg>
-              <span>{cinemaMode ? "Lights On" : "Lights Off"}</span>
-            </button>
-
-            <button
-              className="player-tool-btn"
-              onClick={handleRefresh}
-              title="Reload Video Player"
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
-                <path d="M23 4v6h-6M1 20v-6h6" />
-                <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
-              </svg>
-              <span>Reload</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Server Selector Bar */}
-        <div className="player-server-bar">
-          <span className="server-bar-label">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14">
-              <rect x="2" y="2" width="20" height="8" rx="2" ry="2" />
-              <rect x="2" y="14" width="20" height="8" rx="2" ry="2" />
-              <line x1="6" y1="6" x2="6.01" y2="6" />
-              <line x1="6" y1="18" x2="6.01" y2="18" />
-            </svg>
-            Server:
-          </span>
-          <div className="server-pills">
-            {STREAM_SERVERS.map((server) => (
-              <button
-                key={server.id}
-                className={`server-pill ${activeServer.id === server.id ? "active" : ""}`}
-                onClick={() => setActiveServer(server)}
-              >
-                <span className="server-name">{server.name}</span>
-                <span className="server-badge">{server.badge}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Video Iframe Frame */}
-        <div className="player-iframe-wrapper">
-          <iframe
-            key={key}
-            src={activeServer.url(tmdbId)}
-            title={`Watch ${title}`}
-            allowFullScreen
-            allow="autoplay; encrypted-media; picture-in-picture; accelerometer; gyroscope"
-            referrerPolicy="origin"
-          />
-        </div>
-
-        {/* Player Footer */}
-        <div className="player-footer-bar">
-          <div className="player-status-info">
-            <span className="status-dot" />
-            <span>Connected to <strong>{activeServer.name}</strong> • If controls or video are blocked, switch server above.</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 // ── Skeleton for the detail page ─────────────────────────────
 const DetailSkeleton = () => (
   <div className="detail-skeleton">
@@ -261,19 +67,26 @@ const DetailSkeleton = () => (
 
 // ── Main Component ────────────────────────────────────────────
 const MovieDetail = () => {
-  const { id }       = useParams();
-  const navigate     = useNavigate();
-  const location     = useLocation();
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const [movie,        setMovie]        = useState(null);
-  const [related,      setRelated]      = useState([]);
-  const [loading,      setLoading]      = useState(true);
-  const [error,        setError]        = useState(null);
-  const [playerOpen,   setPlayerOpen]   = useState(
+  // Page state
+  const [movie, setMovie] = useState(null);
+  const [related, setRelated] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [imgError, setImgError] = useState(false);
+  const [playerOpen, setPlayerOpen] = useState(
     location.state?.autoPlay === true
   );
-  const [imgError,     setImgError]     = useState(false);
 
+  // Inline player state
+  const [activeServer, setActiveServer] = useState(STREAM_SERVERS[0]);
+  const [cinemaMode, setCinemaMode] = useState(false);
+  const [playerKey, setPlayerKey] = useState(0);
+
+  // Fetch movie data
   useEffect(() => {
     (async () => {
       try {
@@ -281,15 +94,15 @@ const MovieDetail = () => {
         setError(null);
         setMovie(null);
         setImgError(false);
+        setPlayerOpen(false);
         window.scrollTo({ top: 0, behavior: "smooth" });
 
         const detail = await fetchMovieDetail(id);
         setMovie(detail);
 
-        // Recommendations in background
         fetchRecommendations(id)
           .then(setRelated)
-          .catch(() => {});
+          .catch(() => { });
       } catch (err) {
         setError(err.message);
       } finally {
@@ -298,6 +111,13 @@ const MovieDetail = () => {
     })();
   }, [id]);
 
+  // Scroll to top when player opens so player is visible
+  useEffect(() => {
+    if (playerOpen) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [playerOpen]);
+
   // Close player on Escape key
   useEffect(() => {
     const handleKey = (e) => { if (e.key === "Escape") setPlayerOpen(false); };
@@ -305,6 +125,14 @@ const MovieDetail = () => {
     return () => window.removeEventListener("keydown", handleKey);
   }, []);
 
+  const openPlayer = () => {
+    setActiveServer(STREAM_SERVERS[0]);
+    setCinemaMode(false);
+    setPlayerKey((k) => k + 1);
+    setPlayerOpen(true);
+  };
+
+  // ── Loading state ─────────────────────────────────────────────
   if (loading) {
     return (
       <div className="movie-detail-page">
@@ -315,6 +143,7 @@ const MovieDetail = () => {
     );
   }
 
+  // ── Error state ───────────────────────────────────────────────
   if (error || !movie) {
     return (
       <div className="movie-detail-page">
@@ -336,7 +165,70 @@ const MovieDetail = () => {
     n > 0 ? `$${(n / 1_000_000).toFixed(1)}M` : "N/A";
 
   return (
-    <div className="movie-detail-page">
+    <div className={`movie-detail-page${cinemaMode && playerOpen ? " cinema-mode" : ""}`}>
+
+      {/* ── Inline Video Player (renders at top when Watch Now is clicked) ── */}
+      {playerOpen && (
+        <div className="inline-player">
+
+          {/* Close button */}
+          <button
+            className="inline-close-btn"
+            onClick={() => { setPlayerOpen(false); setCinemaMode(false); }}
+            id="inline-player-close"
+            aria-label="Close player"
+            title="Close Player"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="16" height="16">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </button>
+
+          {/* Server selector */}
+          <div className="inline-server-bar">
+            <span className="inline-server-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="13" height="13">
+                <rect x="2" y="2" width="20" height="8" rx="2" ry="2" />
+                <rect x="2" y="14" width="20" height="8" rx="2" ry="2" />
+                <line x1="6" y1="6" x2="6.01" y2="6" />
+                <line x1="6" y1="18" x2="6.01" y2="18" />
+              </svg>
+              Server:
+            </span>
+            <div className="inline-server-pills">
+              {STREAM_SERVERS.map((server) => (
+                <button
+                  key={server.id}
+                  className={`inline-server-pill${activeServer.id === server.id ? " active" : ""}`}
+                  onClick={() => setActiveServer(server)}
+                >
+                  {server.name}
+                  <span className="inline-server-badge">{server.badge}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Video iframe */}
+          <div className="inline-iframe-wrapper">
+            <iframe
+              key={playerKey}
+              src={activeServer.url(movie.id)}
+              title={`Watch ${movie.title}`}
+              allowFullScreen
+              allow="autoplay; encrypted-media; picture-in-picture; accelerometer; gyroscope"
+              referrerPolicy="origin"
+            />
+          </div>
+
+          {/* Status footer */}
+          <div className="inline-player-footer">
+            <span className="inline-status-dot" />
+            <span>Connected to <strong>{activeServer.name}</strong> · If video is blocked, try a different server above.</span>
+          </div>
+        </div>
+      )}
+
       {/* Backdrop */}
       <div className="detail-backdrop">
         {movie.backdrop && (
@@ -345,27 +237,13 @@ const MovieDetail = () => {
         <div className="detail-backdrop-overlay" />
       </div>
 
+      {/* Page content */}
       <div className="container detail-container">
-        {/* Back */}
-        <button
-          className="back-btn"
-          onClick={() => {
-            if (window.history.length > 2) {
-              navigate(-1);
-            } else {
-              navigate("/movies");
-            }
-          }}
-          id="detail-back-btn"
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <path d="m15 18-6-6 6-6" />
-          </svg>
-          Back
-        </button>
+
+
 
         <div className="detail-layout">
-          {/* Poster */}
+          {/* Poster column */}
           <div className="detail-poster-wrapper">
             <div className="detail-poster">
               {movie.poster && !imgError ? (
@@ -383,10 +261,9 @@ const MovieDetail = () => {
               <div className="poster-glow" />
             </div>
 
-            {/* Watch button beneath poster on desktop */}
             <button
               className="btn btn-primary watch-poster-btn"
-              onClick={() => setPlayerOpen(true)}
+              onClick={openPlayer}
               id="poster-watch-btn"
             >
               <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
@@ -396,7 +273,7 @@ const MovieDetail = () => {
             </button>
           </div>
 
-          {/* Info */}
+          {/* Info column */}
           <div className="detail-info">
             {/* Genre labels */}
             <div className="detail-genres">
@@ -411,11 +288,12 @@ const MovieDetail = () => {
               <p className="detail-tagline">"{movie.tagline}"</p>
             )}
 
-            {/* Rating + meta */}
+            {/* Rating */}
             <div className="detail-meta-row">
               <StarRating rating={movie.rating} />
             </div>
 
+            {/* Meta pills */}
             <div className="detail-meta-pills">
               <span className="meta-pill">{movie.year}</span>
               {movie.duration && <span className="meta-pill">{movie.duration}</span>}
@@ -456,11 +334,11 @@ const MovieDetail = () => {
               </div>
             )}
 
-            {/* Action Buttons */}
+            {/* Action buttons */}
             <div className="detail-actions">
               <button
                 className="btn btn-primary"
-                onClick={() => setPlayerOpen(true)}
+                onClick={openPlayer}
                 id="detail-watch-btn"
               >
                 <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
@@ -478,7 +356,7 @@ const MovieDetail = () => {
                   id="detail-trailer-btn"
                 >
                   <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
-                    <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                    <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
                   </svg>
                   Watch Trailer
                 </a>
@@ -519,7 +397,7 @@ const MovieDetail = () => {
           </div>
         </div>
 
-        {/* Related / Recommendations */}
+        {/* Recommendations */}
         {related.length > 0 && (
           <div className="related-section">
             <div className="section-header-simple">
@@ -536,17 +414,6 @@ const MovieDetail = () => {
           </div>
         )}
       </div>
-
-      {/* VidSrc Player Modal */}
-      {playerOpen && (
-        <PlayerModal
-          tmdbId={movie.id}
-          title={movie.title}
-          year={movie.year}
-          rating={movie.rating}
-          onClose={() => setPlayerOpen(false)}
-        />
-      )}
     </div>
   );
 };
